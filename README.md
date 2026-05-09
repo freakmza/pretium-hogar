@@ -25,3 +25,9 @@ Abrir:
 O levantar un servidor local desde `web/`:
 
 `php -S 127.0.0.1:8080`
+
+## Publicar
+
+Ver la guia de despliegue en Hostinger:
+
+`docs/DEPLOY-HOSTINGER.md`

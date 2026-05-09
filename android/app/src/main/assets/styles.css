@@ -111,20 +111,11 @@ button { cursor: pointer; }
   border-right-color: var(--accent);
 }
 .nav-icon {
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: auto;
   flex-shrink: 0;
-  display: inline-grid;
-  place-items: center;
-  border-radius: 7px;
-  background: rgba(255, 255, 255, .06);
-  color: #c7d6cc;
-  font-size: 10px;
-  font-weight: 850;
-}
-.nav-item.active .nav-icon {
-  background: rgba(251, 191, 36, .16);
-  color: var(--accent);
+  text-align: center;
+  font-size: 16px;
 }
 
 .topbar {
@@ -313,8 +304,7 @@ textarea.field { min-height: 84px; resize: vertical; }
   border-radius: 999px;
   background: #111827;
   color: #fbbf24;
-  font-size: 12px;
-  font-weight: 900;
+  font-size: 16px;
   line-height: 1;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08), 0 2px 6px rgba(17, 24, 39, .18);
 }

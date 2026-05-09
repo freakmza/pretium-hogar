@@ -423,7 +423,7 @@ function setTheme(theme) {
     btn.setAttribute("aria-label", btn.title);
     btn.classList.toggle("is-dark", theme === "dark");
   }
-  if (icon) icon.textContent = theme === "dark" ? "C" : "D";
+  if (icon) icon.textContent = theme === "dark" ? "☀️" : "🌙";
   saveState();
 }
 

@@ -1,0 +1,19 @@
+PRETIUM HOGAR
+
+PRETIUM HOGAR es una app para registrar, ordenar y entender los gastos reales de una casa.
+No obliga a trabajar con presupuesto. Primero registra lo que pasa: compras, servicios,
+impuestos, escuela, vencimientos y pagos pendientes. El presupuesto es una herramienta
+opcional que se puede activar si el usuario quiere comparar gastos contra limites.
+
+Modulos principales:
+- Inicio: resumen mensual, pagado, pendiente, vencimientos y categorias fuertes.
+- Cargar gasto: registro rapido de cualquier gasto del hogar.
+- Gastos del hogar: alimentos, limpieza, farmacia, salud, transporte, mantenimiento, ocio y varios.
+- Servicios: luz, gas, agua, internet, alquiler, expensas, impuestos y suscripciones.
+- Escuela: hijos, cuotas, matricula, utiles, uniforme, comedor, transporte y actividades.
+- Vencimientos: pagos pendientes, vencidos y proximos.
+- Reportes: categorias, comparacion mensual, gastos fijos vs variables y aumentos.
+- Configuracion: nombre del hogar, moneda, categorias, tema y presupuesto opcional.
+
+Pregunta que responde:
+Cuanto cuesta mantener mi casa y mi familia este mes.

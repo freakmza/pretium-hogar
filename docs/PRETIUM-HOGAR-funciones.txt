@@ -1,0 +1,25 @@
+PRIMERA VERSION
+
+Incluye:
+- App web responsive.
+- Datos guardados en localStorage.
+- Registro de gastos comunes.
+- Registro de gastos variables del hogar.
+- Registro de servicios e impuestos con vencimiento.
+- Registro de hijos y gastos escolares por hijo.
+- Vencimientos pendientes y vencidos.
+- Reportes mensuales basicos.
+- Presupuesto opcional, desactivado por defecto.
+- Pagos recurrentes reales: suscripciones, alquiler, internet y servicios se generan mes a mes.
+- Edicion de movimientos para corregir montos, fechas, categorias o estados.
+- En movimientos recurrentes, se puede actualizar solo el movimiento actual o tambien la plantilla futura.
+- Exportacion e importacion JSON.
+- Tema claro y oscuro.
+
+Pendiente para versiones futuras:
+- Exportar Excel.
+- Adjuntar comprobantes.
+- Sincronizacion online.
+- Usuarios.
+- Backups automaticos.
+- APK Android firmada.

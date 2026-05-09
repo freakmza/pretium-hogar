@@ -15,11 +15,13 @@ Incluye:
 - En movimientos recurrentes, se puede actualizar solo el movimiento actual o tambien la plantilla futura.
 - Exportacion e importacion JSON.
 - Tema claro y oscuro.
+- Sincronizacion online con API PHP/MySQL.
+- Login de usuarios.
+- Administracion de usuarios.
+- Backup desde servidor.
 
 Pendiente para versiones futuras:
 - Exportar Excel.
 - Adjuntar comprobantes.
-- Sincronizacion online.
-- Usuarios.
 - Backups automaticos.
 - APK Android firmada.

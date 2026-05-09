@@ -423,7 +423,7 @@ function setTheme(theme) {
     btn.setAttribute("aria-label", btn.title);
     btn.classList.toggle("is-dark", theme === "dark");
   }
-  if (icon) icon.textContent = theme === "dark" ? "☀️" : "🌙";
+  if (icon) icon.textContent = theme === "dark" ? "C" : "D";
   saveState();
 }
 
@@ -549,16 +549,29 @@ function renderHome() {
   const t = totals(items);
   const cats = categoryTotals(items);
   const due = upcoming().slice(0, 5);
+  const dueThisMonth = upcoming().filter(x => monthKey(x.dueDate) === selectedMonth).length;
   const budgetOn = state.settings.budgetEnabled;
   const budget = Number(state.settings.monthlyBudget || 0);
   const budgetLeft = budget - t.total;
   const top = cats[0];
 
   document.getElementById("view-inicio").innerHTML = `
+    <section class="home-hero">
+      <div>
+        <p class="home-kicker">PRETIUM HOGAR</p>
+        <h2>${escapeHtml(state.settings.homeName || "Mi hogar")}</h2>
+        <p>${monthLabel(selectedMonth)} ordenado por consumos, servicios, escuela y vencimientos.</p>
+      </div>
+      <div class="home-hero-side">
+        <span>Estado del mes</span>
+        <strong>${dueThisMonth ? `${dueThisMonth} vencimientos` : "Sin vencimientos"}</strong>
+        <small>${t.pending ? `${money(t.pending)} pendiente` : "Pagos al dia"}</small>
+      </div>
+    </section>
     <div class="grid cols-4">
-      <div class="panel stat"><span>Total del mes</span><strong>${money(t.total)}</strong><small>${items.length} registros</small></div>
+      <div class="panel stat featured"><span>Total del mes</span><strong>${money(t.total)}</strong><small>${items.length} registros</small></div>
       <div class="panel stat"><span>Pagado</span><strong>${money(t.paid)}</strong><small>${percent(t.paid, t.total)} del total</small></div>
-      <div class="panel stat"><span>Pendiente</span><strong>${money(t.pending)}</strong><small>${upcoming().filter(x => monthKey(x.dueDate) === selectedMonth).length} vencimientos</small></div>
+      <div class="panel stat"><span>Pendiente</span><strong>${money(t.pending)}</strong><small>${dueThisMonth} vencimientos</small></div>
       <div class="panel stat"><span>${budgetOn ? "Presupuesto restante" : "Mayor categoria"}</span><strong>${budgetOn ? money(budgetLeft) : escapeHtml(top?.[0] || "-")}</strong><small>${budgetOn ? budgetStatus(budgetLeft) : money(top?.[1] || 0)}</small></div>
     </div>
     <div class="grid cols-2" style="margin-top:14px">
@@ -591,7 +604,7 @@ function budgetStatus(value) {
 }
 
 function renderCategoryBars(cats) {
-  if (!cats.length) return `<div class="empty">Todavia no hay gastos en este mes.</div>`;
+  if (!cats.length) return `<div class="empty"><strong>Sin consumos cargados</strong>Cuando registres movimientos, aca vas a ver el peso de cada categoria.</div>`;
   const max = Math.max(...cats.map(([, total]) => total), 1);
   return `<div class="list">${cats.map(([cat, total]) => `
     <div>
@@ -605,7 +618,7 @@ function renderCategoryBars(cats) {
 }
 
 function renderDueList(items) {
-  if (!items.length) return `<div class="empty">No hay vencimientos pendientes.</div>`;
+  if (!items.length) return `<div class="empty"><strong>Agenda sin pendientes</strong>No hay pagos vencidos ni proximos para mostrar.</div>`;
   return `<div class="list">${items.map(item => `
     <div class="row-item">
       <div>
@@ -671,20 +684,20 @@ function statusOptions(selected) {
 }
 
 function renderExpenseTable(items, allowActions) {
-  if (!items.length) return `<div class="empty">No hay registros para mostrar.</div>`;
+  if (!items.length) return `<div class="empty"><strong>No hay registros</strong>Los movimientos que cargues para este mes van a aparecer aca.</div>`;
   const rows = items
     .slice()
     .sort((a, b) => (b.date || "").localeCompare(a.date || ""))
     .map(item => `
       <tr>
-        <td>${formatDate(item.date)}</td>
-        <td><strong>${escapeHtml(item.description)}</strong><br><span class="muted">${escapeHtml(item.paymentMethod || "")}</span></td>
-        <td>${escapeHtml(item.category)}</td>
-        <td><span class="badge">${labelType(item.type)}</span></td>
-        <td>${money(item.amount)}</td>
-        <td><span class="badge ${item.status === "pagado" ? "ok" : "warn"}">${item.status}</span></td>
-        <td>${item.dueDate ? formatDate(item.dueDate) : "-"}</td>
-        ${allowActions ? `<td class="actions"><button class="btn" data-edit="${item.id}">Editar</button> <button class="btn" data-paid="${item.id}">Pagar</button> <button class="btn danger" data-del="${item.id}">Borrar</button></td>` : ""}
+        <td data-label="Fecha">${formatDate(item.date)}</td>
+        <td data-label="Detalle"><strong>${escapeHtml(item.description)}</strong><br><span class="muted">${escapeHtml(item.paymentMethod || "")}</span></td>
+        <td data-label="Categoria">${escapeHtml(item.category)}</td>
+        <td data-label="Tipo"><span class="badge">${labelType(item.type)}</span></td>
+        <td data-label="Monto">${money(item.amount)}</td>
+        <td data-label="Estado"><span class="badge ${item.status === "pagado" ? "ok" : "warn"}">${item.status}</span></td>
+        <td data-label="Vence">${item.dueDate ? formatDate(item.dueDate) : "-"}</td>
+        ${allowActions ? `<td class="actions" data-label="Acciones"><button class="btn" data-edit="${item.id}">Editar</button> <button class="btn" data-paid="${item.id}">Pagar</button> <button class="btn danger" data-del="${item.id}">Borrar</button></td>` : ""}
       </tr>
     `).join("");
   return `<div class="table-wrap"><table>
@@ -772,17 +785,17 @@ function renderServices() {
 }
 
 function renderRecurringList() {
-  if (!state.recurring.length) return `<div class="empty">Todavia no hay pagos recurrentes. Marcá "Recurrente: Si" al cargar un servicio o suscripción.</div>`;
+  if (!state.recurring.length) return `<div class="empty"><strong>Sin pagos recurrentes</strong>Marcá "Recurrente: Si" al cargar un servicio o suscripcion.</div>`;
   return `<div class="table-wrap"><table>
     <thead><tr><th>Detalle</th><th>Categoria</th><th>Monto</th><th>Vence</th><th>Estado</th><th></th></tr></thead>
     <tbody>${state.recurring.map(item => `
       <tr>
-        <td><strong>${escapeHtml(item.description)}</strong><br><span class="muted">${escapeHtml(labelType(item.type))}</span></td>
-        <td>${escapeHtml(item.category)}</td>
-        <td>${money(item.amount)}</td>
-        <td>día ${item.dueDay || 1}</td>
-        <td><span class="badge ${item.active === false ? "danger" : "ok"}">${item.active === false ? "Pausado" : "Activo"}</span></td>
-        <td class="actions"><button class="btn" data-recurring-generate="${item.id}">Generar mes</button> <button class="btn" data-recurring-toggle="${item.id}">${item.active === false ? "Activar" : "Pausar"}</button></td>
+        <td data-label="Detalle"><strong>${escapeHtml(item.description)}</strong><br><span class="muted">${escapeHtml(labelType(item.type))}</span></td>
+        <td data-label="Categoria">${escapeHtml(item.category)}</td>
+        <td data-label="Monto">${money(item.amount)}</td>
+        <td data-label="Vence">dia ${item.dueDay || 1}</td>
+        <td data-label="Estado"><span class="badge ${item.active === false ? "danger" : "ok"}">${item.active === false ? "Pausado" : "Activo"}</span></td>
+        <td class="actions" data-label="Acciones"><button class="btn" data-recurring-generate="${item.id}">Generar mes</button> <button class="btn" data-recurring-toggle="${item.id}">${item.active === false ? "Activar" : "Pausar"}</button></td>
       </tr>
     `).join("")}</tbody>
   </table></div>`;
@@ -817,7 +830,7 @@ function renderSchool() {
 }
 
 function renderChildren() {
-  if (!state.children.length) return `<div class="empty">Todavia no hay hijos cargados.</div>`;
+  if (!state.children.length) return `<div class="empty"><strong>Sin hijos cargados</strong>Cuando agregues hijos, podras separar los gastos escolares por cada uno.</div>`;
   return `<div class="list">${state.children.map(child => `
     <div class="row-item">
       <div><strong>${escapeHtml(child.name)}</strong><span>${escapeHtml(child.school || "Sin escuela")} · ${escapeHtml(child.grade || "Sin curso")}</span></div>

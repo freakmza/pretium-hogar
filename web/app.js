@@ -392,6 +392,14 @@ function dateFromMonthDay(month, day) {
   return `${year}-${String(rawMonth).padStart(2, "0")}-${String(safeDay).padStart(2, "0")}`;
 }
 
+function periodAccumulatedItems(items, periodKey = selectedMonth) {
+  const today = todayISO();
+  const currentMonth = monthKey(today);
+  if (periodKey < currentMonth) return items;
+  if (periodKey > currentMonth) return [];
+  return items.filter(item => (item.date || item.dueDate || "") <= today);
+}
+
 function dayFromISO(iso) {
   if (!iso) return 1;
   const day = Number(String(iso).split("-")[2]);
@@ -547,13 +555,10 @@ function renderMonthSelect() {
 function renderHome() {
   const items = monthExpenses();
   const t = totals(items);
+  const accumulated = totals(periodAccumulatedItems(items, selectedMonth));
   const cats = categoryTotals(items);
   const due = upcoming().slice(0, 5);
   const dueThisMonth = upcoming().filter(x => monthKey(x.dueDate) === selectedMonth).length;
-  const budgetOn = state.settings.budgetEnabled;
-  const budget = Number(state.settings.monthlyBudget || 0);
-  const budgetLeft = budget - t.total;
-  const top = cats[0];
 
   document.getElementById("view-inicio").innerHTML = `
     <section class="home-hero">
@@ -570,9 +575,9 @@ function renderHome() {
     </section>
     <div class="grid cols-4">
       <div class="panel stat featured"><span>Total del mes</span><strong>${money(t.total)}</strong><small>${items.length} registros</small></div>
+      <div class="panel stat"><span>Consumo acumulado</span><strong>${money(accumulated.total)}</strong><small>${accumulatedPeriodLabel(selectedMonth)}</small></div>
       <div class="panel stat"><span>Pagado</span><strong>${money(t.paid)}</strong><small>${percent(t.paid, t.total)} del total</small></div>
       <div class="panel stat"><span>Pendiente</span><strong>${money(t.pending)}</strong><small>${dueThisMonth} vencimientos</small></div>
-      <div class="panel stat"><span>${budgetOn ? "Presupuesto restante" : "Mayor categoria"}</span><strong>${budgetOn ? money(budgetLeft) : escapeHtml(top?.[0] || "-")}</strong><small>${budgetOn ? budgetStatus(budgetLeft) : money(top?.[1] || 0)}</small></div>
     </div>
     <div class="grid cols-2" style="margin-top:14px">
       <div class="panel">
@@ -591,6 +596,14 @@ function renderHome() {
       <div class="panel-body">${renderExpenseTable(items.slice().sort((a, b) => b.date.localeCompare(a.date)).slice(0, 8), false)}</div>
     </div>
   `;
+}
+
+function accumulatedPeriodLabel(periodKey) {
+  const today = todayISO();
+  const currentMonth = monthKey(today);
+  if (periodKey < currentMonth) return "Periodo cerrado";
+  if (periodKey > currentMonth) return "Periodo futuro";
+  return `Al ${formatDate(today)}`;
 }
 
 function percent(value, total) {
@@ -1175,13 +1188,13 @@ document.addEventListener("click", event => {
     closeModal();
     return;
   }
-  if (event.target.id === "menu-btn") document.body.classList.toggle("menu-open");
-  if (event.target.id === "theme-btn") setTheme(state.settings.theme === "dark" ? "light" : "dark");
-  if (event.target.id === "export-btn") downloadJson();
-  if (event.target.id === "server-backup-btn") downloadServerBackup();
-  if (event.target.id === "sync-now-btn") saveRemoteState(true);
-  if (event.target.id === "sync-pull-btn" && confirm("Esto reemplaza los datos locales con lo guardado en el servidor.")) loadRemoteState();
-  if (event.target.id === "logout-btn") {
+  if (event.target.closest("#menu-btn")) document.body.classList.toggle("menu-open");
+  if (event.target.closest("#theme-btn")) setTheme(state.settings.theme === "dark" ? "light" : "dark");
+  if (event.target.closest("#export-btn")) downloadJson();
+  if (event.target.closest("#server-backup-btn")) downloadServerBackup();
+  if (event.target.closest("#sync-now-btn")) saveRemoteState(true);
+  if (event.target.closest("#sync-pull-btn") && confirm("Esto reemplaza los datos locales con lo guardado en el servidor.")) loadRemoteState();
+  if (event.target.closest("#logout-btn")) {
     logout().then(() => {
       toast("Sesion cerrada");
       showLogin();

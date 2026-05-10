@@ -142,7 +142,7 @@ function isLoggedIn() {
 }
 
 function isLocalPreview() {
-  return ["localhost", "127.0.0.1"].includes(location.hostname);
+  return location.protocol === "file:" || ["localhost", "127.0.0.1"].includes(location.hostname);
 }
 
 function authHeaders(extra = {}) {
